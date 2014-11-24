@@ -202,16 +202,16 @@ NSUInteger DeviceSystemMajorVersion(void) {
     @param indexPath The indexPath to check if it represents start/end date cell.
 */
 - (BOOL)indexPathHasDate:(NSIndexPath *)indexPath {
-    BOOL hasDate = NO;
+    BOOL result = NO;
 
     switch (indexPath.row) {
         case kDateStartRow:
         case kDateEndRow:
-            hasDate = YES;
+            result = YES;
             break;
     }
 
-    return hasDate;
+    return result;
 }
 
 
@@ -235,10 +235,9 @@ NSUInteger DeviceSystemMajorVersion(void) {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell;
-    
     NSString *reuseIdentifier = kOtherCell;
     NSInteger row = indexPath.row;
-    NSDictionary *itemData;
+    NSDictionary *dataSource;
 
     // Does this index path have a date picker? If so, decrement the row.
     if ([self indexPathHasPicker:indexPath]) {
@@ -252,22 +251,22 @@ NSUInteger DeviceSystemMajorVersion(void) {
     }
 
     cell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier];
-    
+
+    // Remove selections from the first row since it's just a title.
     if (indexPath.row == 0) {
-        // we decide here that first cell in the table is not selectable (it's just an indicator)
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     
-    itemData = self.dataArray[(NSUInteger)row];
+    dataSource = self.dataArray[(NSUInteger)row];
 
     //-- Table view cell configuration
     if ([reuseIdentifier isEqualToString:kDateCellID]) {
-        cell.textLabel.text = itemData[kTitleKey];
-        cell.detailTextLabel.text = [self.dateFormatter stringFromDate:itemData[kDateKey]];
+        cell.textLabel.text = dataSource[kTitleKey];
+        cell.detailTextLabel.text = [self.dateFormatter stringFromDate:dataSource[kDateKey]];
     }
 
     else if ([reuseIdentifier isEqualToString:kOtherCell]) {
-        cell.textLabel.text = itemData[kTitleKey];
+        cell.textLabel.text = dataSource[kTitleKey];
     }
     
 	return cell;
@@ -283,14 +282,14 @@ NSUInteger DeviceSystemMajorVersion(void) {
     NSArray *indexPaths = @[[NSIndexPath indexPathForRow:indexPath.row + 1
                                                inSection:0]];
                             
-    // check if 'indexPath' has an attached date picker below it
+    // If the index path has a date picker, then remove it.
     if ([self hasPickerForIndexPath:indexPath]) {
-        // found a picker below it, so remove it
         [self.tableView deleteRowsAtIndexPaths:indexPaths
                               withRowAnimation:UITableViewRowAnimationFade];
     }
+
+    // Otherwise, add a new date picker to the index path.
     else {
-        // didn't find a picker below it, so we should insert it
         [self.tableView insertRowsAtIndexPaths:indexPaths
                               withRowAnimation:UITableViewRowAnimationFade];
     }
@@ -304,6 +303,7 @@ NSUInteger DeviceSystemMajorVersion(void) {
  */
 - (void)displayInlineDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView beginUpdates];
+
     NSIndexPath *datePickerIndexPath;
 
     // Is a date picker already showing? If so, remove it from the table view.
@@ -334,9 +334,11 @@ NSUInteger DeviceSystemMajorVersion(void) {
 }
 
 #pragma mark - UITableViewDelegate
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+
+    // If the selected cell is a "date cell", then present a UIDatePicker below
+    // it.
     if (cell.reuseIdentifier == kDateCellID) {
         if (EMBEDDED_DATE_PICKER) {
             [self displayInlineDatePickerForRowAtIndexPath:indexPath];
