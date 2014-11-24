@@ -172,8 +172,8 @@ NSUInteger DeviceSystemMajorVersion(void) {
     }
 
     UITableViewCell *datePickerCell = [self.tableView cellForRowAtIndexPath:self.datePickerIndexPath];
-
     UIDatePicker *datePicker = (UIDatePicker *)[datePickerCell viewWithTag:kDatePickerTag];
+
     if (datePicker) {
         NSDictionary *itemData = self.dataArray[(NSUInteger)self.datePickerIndexPath.row - 1];
         datePicker.date = itemData[kDateKey];
@@ -203,13 +203,14 @@ NSUInteger DeviceSystemMajorVersion(void) {
 */
 - (BOOL)indexPathHasDate:(NSIndexPath *)indexPath {
     BOOL hasDate = NO;
-    
-    if ((indexPath.row == kDateStartRow) ||
-        (indexPath.row == kDateEndRow ||
-         (self.datePickerIndexPath && (indexPath.row == kDateEndRow + 1)))) {
-        hasDate = YES;
+
+    switch (indexPath.row) {
+        case kDateStartRow:
+        case kDateEndRow:
+            hasDate = YES;
+            break;
     }
-    
+
     return hasDate;
 }
 
@@ -355,28 +356,26 @@ NSUInteger DeviceSystemMajorVersion(void) {
  @param sender The sender for this action: UIDatePicker.
  */
 - (IBAction)dateAction:(id)sender {
-    NSIndexPath *targetedCellIndexPath;
-    
+    NSIndexPath *indexPath;
+    UITableViewCell *cell;
+    UIDatePicker *datePicker = (UIDatePicker *)sender;
+    NSMutableDictionary *dataSource;
+
+    // If the date picker is showing, update it's owner cell which will always
+    // be 1 row above.
     if (self.datePickerIndexPath) {
-        // inline date picker: update the cell's date "above" the date picker cell
-        //
-        targetedCellIndexPath = [NSIndexPath indexPathForRow:self.datePickerIndexPath.row - 1
+        indexPath = [NSIndexPath indexPathForRow:self.datePickerIndexPath.row - 1
                                                    inSection:0];
     }
-    else {
-        // external date picker: update the current "selected" cell's date
-        targetedCellIndexPath = [self.tableView indexPathForSelectedRow];
-    }
     
-    UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:targetedCellIndexPath];
-    UIDatePicker *targetedDatePicker = sender;
+    cell = [self.tableView cellForRowAtIndexPath:indexPath];
     
     // update our data model
-    NSMutableDictionary *itemData = self.dataArray[(NSUInteger)targetedCellIndexPath.row];
-    [itemData setValue:targetedDatePicker.date forKey:kDateKey];
+    dataSource = self.dataArray[(NSUInteger)indexPath.row];
+    dataSource[kDateKey] = datePicker.date;
     
     // update the cell's date string
-    cell.detailTextLabel.text = [self.dateFormatter stringFromDate:targetedDatePicker.date];
+    cell.detailTextLabel.text = [self.dateFormatter stringFromDate:datePicker.date];
 }
 
 @end
