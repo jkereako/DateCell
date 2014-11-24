@@ -286,8 +286,7 @@ NSUInteger DeviceSystemMajorVersion() {
  
  @param indexPath The indexPath to reveal the UIDatePicker.
  */
-- (void)toggleDatePickerForSelectedIndexPath:(NSIndexPath *)indexPath
-{
+- (void)toggleDatePickerForSelectedIndexPath:(NSIndexPath *)indexPath {
     [self.tableView beginUpdates];
     
     NSArray *indexPaths = @[[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0]];
@@ -311,8 +310,7 @@ NSUInteger DeviceSystemMajorVersion() {
  
  @param indexPath The indexPath to reveal the UIDatePicker.
  */
-- (void)displayInlineDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)displayInlineDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath {
     // display the date picker inline with the table content
     [self.tableView beginUpdates];
     
@@ -352,8 +350,7 @@ NSUInteger DeviceSystemMajorVersion() {
  
  @param indexPath The indexPath used to display the UIDatePicker.
  */
-- (void)displayExternalDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)displayExternalDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath {
     // first update the date picker's date value according to our model
     NSDictionary *itemData = self.dataArray[indexPath.row];
     [self.pickerView setDate:[itemData valueForKey:kDateKey] animated:YES];
@@ -385,8 +382,7 @@ NSUInteger DeviceSystemMajorVersion() {
 
 #pragma mark - UITableViewDelegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     if (cell.reuseIdentifier == kDateCellID) {
         if (EMBEDDED_DATE_PICKER) {
