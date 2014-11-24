@@ -66,18 +66,16 @@ static NSString *kOtherCell = @"otherCell";     // the remaining cells at the en
 
 @interface MyTableViewController ()
 
-@property (nonatomic, strong) NSArray *dataArray;
-@property (nonatomic, strong) NSDateFormatter *dateFormatter;
+@property (nonatomic, readwrite) NSArray *dataArray;
+@property (nonatomic, readwrite) NSDateFormatter *dateFormatter;
 
 // keep track which indexPath points to the cell with UIDatePicker
-@property (nonatomic, strong) NSIndexPath *datePickerIndexPath;
-
-@property (assign) NSInteger pickerCellRowHeight;
-
-@property (nonatomic, strong) IBOutlet UIDatePicker *pickerView;
+@property (nonatomic, readwrite) NSIndexPath *datePickerIndexPath;
+@property (nonatomic, readwrite) NSInteger pickerCellRowHeight;
+@property (nonatomic, weak, readwrite) IBOutlet UIDatePicker *pickerView;
 
 // this button appears only when the date picker is shown (iOS 6.1.x or earlier)
-@property (nonatomic, strong) IBOutlet UIBarButtonItem *doneButton;
+@property (nonatomic, weak, readwrite) IBOutlet UIBarButtonItem *doneButton;
 
 @end
 
@@ -101,9 +99,9 @@ static NSString *kOtherCell = @"otherCell";     // the remaining cells at the en
     NSMutableDictionary *itemFive = [@{ kTitleKey : @"(other item2)" } mutableCopy];
     self.dataArray = @[itemOne, itemTwo, itemThree, itemFour, itemFive];
     
-    self.dateFormatter = [[NSDateFormatter alloc] init];
-    [self.dateFormatter setDateStyle:NSDateFormatterShortStyle];    // show short-style date format
-    [self.dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+    self.dateFormatter = [NSDateFormatter new];
+    self.dateFormatter.dateStyle = NSDateFormatterShortStyle;
+    self.dateFormatter.timeStyle = NSDateFormatterNoStyle;
     
     // obtain the picker view cell's height, works because the cell was pre-defined in our storyboard
     UITableViewCell *pickerViewCellToCheck = [self.tableView dequeueReusableCellWithIdentifier:kDatePickerID];
@@ -130,9 +128,6 @@ static NSString *kOtherCell = @"otherCell";     // the remaining cells at the en
 /*! Responds to region format or locale changes.
  */
 - (void)localeChanged:(NSNotification *)notif {
-    // the user changed the locale (region format) in Settings, so we are notified here to
-    // update the date format in the table view cells
-    //
     [self.tableView reloadData];
 }
 
@@ -200,7 +195,15 @@ NSUInteger DeviceSystemMajorVersion() {
  @param indexPath The indexPath to check if it represents a cell with the UIDatePicker.
  */
 - (BOOL)indexPathHasPicker:(NSIndexPath *)indexPath {
-    return ([self hasInlineDatePicker] && self.datePickerIndexPath.row == indexPath.row);
+    BOOL result = NO;
+
+    if (self.datePickerIndexPath) {
+        if (self.datePickerIndexPath.row == indexPath.row) {
+            result = YES;
+        }
+    }
+
+    return result;
 }
 
 /*! Determines if the given indexPath points to a cell that contains the start/end dates.
@@ -222,31 +225,34 @@ NSUInteger DeviceSystemMajorVersion() {
 #pragma mark - UITableViewDataSource
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return ([self indexPathHasPicker:indexPath] ? self.pickerCellRowHeight : self.tableView.rowHeight);
+    return ([self indexPathHasPicker:indexPath]) ? self.pickerCellRowHeight : self.tableView.rowHeight;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if ([self hasInlineDatePicker]) {
-        // we have a date picker, so allow for it in the number of rows in this section
-        NSInteger numRows = self.dataArray.count;
-        return ++numRows;
+    NSInteger rowCount = self.dataArray.count;
+
+    // If a datepicker is visible, then account for it by incrementing the row
+    // count by 1
+    if (self.datePickerIndexPath) {
+        rowCount ++;
     }
     
-    return self.dataArray.count;
+    return rowCount;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell;
     
     NSString *cellID = kOtherCell;
-    
+
+    // Does this index path have a date picker?
     if ([self indexPathHasPicker:indexPath]) {
-        // the indexPath is the one containing the inline date picker
-        cellID = kDatePickerID;     // the current/opened date picker cell
+        cellID = kDatePickerID;
     }
+
+    // Else, does this index path have a date string?
     else if ([self indexPathHasDate:indexPath]) {
-        // the indexPath is one that contains the date information
-        cellID = kDateCellID;       // the start/end date cells
+        cellID = kDateCellID;
     }
 
     cell = [tableView dequeueReusableCellWithIdentifier:cellID];
@@ -260,23 +266,20 @@ NSUInteger DeviceSystemMajorVersion() {
     // then we have one more cell than the model allows
     //
     NSInteger modelRow = indexPath.row;
-    if (self.datePickerIndexPath != nil && self.datePickerIndexPath.row <= indexPath.row) {
+    if (self.datePickerIndexPath) {
         modelRow--;
     }
     
     NSDictionary *itemData = self.dataArray[modelRow];
-    
-    // proceed to configure our cell
+
+    //-- Table view cell configuration
     if ([cellID isEqualToString:kDateCellID]) {
-        // we have either start or end date cells, populate their date field
-        //
         cell.textLabel.text = [itemData valueForKey:kTitleKey];
-        cell.detailTextLabel.text = [self.dateFormatter stringFromDate:[itemData valueForKey:kDateKey]];
+        cell.detailTextLabel.text = [self.dateFormatter stringFromDate:itemData[kDateKey]];
     }
+
     else if ([cellID isEqualToString:kOtherCell]) {
-        // this cell is a non-date cell, just assign it's text label
-        //
-        cell.textLabel.text = [itemData valueForKey:kTitleKey];
+        cell.textLabel.text = itemData[kTitleKey];
     }
     
 	return cell;
@@ -289,7 +292,8 @@ NSUInteger DeviceSystemMajorVersion() {
 - (void)toggleDatePickerForSelectedIndexPath:(NSIndexPath *)indexPath {
     [self.tableView beginUpdates];
     
-    NSArray *indexPaths = @[[NSIndexPath indexPathForRow:indexPath.row + 1 inSection:0]];
+    NSArray *indexPaths = @[[NSIndexPath indexPathForRow:indexPath.row + 1
+                                               inSection:0]];
                             
     // check if 'indexPath' has an attached date picker below it
     if ([self hasPickerForIndexPath:indexPath]) {
@@ -311,37 +315,32 @@ NSUInteger DeviceSystemMajorVersion() {
  @param indexPath The indexPath to reveal the UIDatePicker.
  */
 - (void)displayInlineDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath {
-    // display the date picker inline with the table content
     [self.tableView beginUpdates];
-    
-    BOOL before = NO;   // indicates if the date picker is below "indexPath", help us determine which row to reveal
-    if ([self hasInlineDatePicker]) {
-        before = self.datePickerIndexPath.row < indexPath.row;
-    }
-    
-    BOOL sameCellClicked = (self.datePickerIndexPath.row - 1 == indexPath.row);
-    
-    // remove any date picker cell if it exists
-    if ([self hasInlineDatePicker]) {
-        [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.datePickerIndexPath.row inSection:0]]
+    NSIndexPath *datePickerIndexPath;
+
+    // Is a date picker already showing? If so, remove it from the table view.
+    if (self.datePickerIndexPath) {
+        datePickerIndexPath = [NSIndexPath indexPathForRow:self.datePickerIndexPath.row
+                                                 inSection:0];
+        [self.tableView deleteRowsAtIndexPaths:@[datePickerIndexPath]
                               withRowAnimation:UITableViewRowAnimationFade];
         self.datePickerIndexPath = nil;
     }
-    
-    if (!sameCellClicked) {
-        // hide the old date picker and display the new one
-        NSInteger rowToReveal = (before ? indexPath.row - 1 : indexPath.row);
-        NSIndexPath *indexPathToReveal = [NSIndexPath indexPathForRow:rowToReveal inSection:0];
-        
-        [self toggleDatePickerForSelectedIndexPath:indexPathToReveal];
-        self.datePickerIndexPath = [NSIndexPath indexPathForRow:indexPathToReveal.row + 1 inSection:0];
+
+    // Otherwise, add a new date picker to the table view
+    else {
+        NSInteger datePickerRow =  (self.datePickerIndexPath.row > indexPath.row) ? indexPath.row - 1 : indexPath.row;
+        datePickerIndexPath = [NSIndexPath indexPathForRow:datePickerRow
+                                                 inSection:0];
+
+        [self toggleDatePickerForSelectedIndexPath:datePickerIndexPath];
+        self.datePickerIndexPath = [NSIndexPath indexPathForRow:datePickerIndexPath.row + 1
+                                                      inSection:0];
     }
-    
-    // always deselect the row containing the start or end date
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
+
     [self.tableView endUpdates];
-    
+
     // inform our date picker of the current date to match the current cell
     [self updateDatePicker];
 }
