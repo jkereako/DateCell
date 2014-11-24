@@ -1,3 +1,8 @@
+# Changes made to this project
+The code example, [DateCell](https://developer.apple.com/library/ios/samplecode/datecell/introduction/intro.html) shows how to display UIPickerViews inline, per iOS 7 suggestions. The problem, is the code in this project is poorly written and hard to understand. It looks like an Apple engineer wrote this on his 30-minute lunchbreak.
+
+I went through the code removing unused variables and uneccessary logic in an attempt to make this code clearer so it can be used in other projects.
+
 # Description
 Demonstrates formatted display of date objects in table cells and use of UIDatePicker to edit those values.
 
