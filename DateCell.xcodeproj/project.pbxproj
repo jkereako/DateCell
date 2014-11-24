@@ -8,28 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		3629FCFE1A239F83006F56DB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3629FCFD1A239F83006F56DB /* Images.xcassets */; };
 		53095FF50D9C4D1A00F143AD /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 53095FF30D9C4D1A00F143AD /* AppDelegate.m */; };
-		5358807B177DE96D0092E6E2 /* Default-568h@2x_iOS7.png in Resources */ = {isa = PBXBuildFile; fileRef = 53588079177DE96D0092E6E2 /* Default-568h@2x_iOS7.png */; };
-		5358807C177DE96D0092E6E2 /* Default@2x_iOS7.png in Resources */ = {isa = PBXBuildFile; fileRef = 5358807A177DE96D0092E6E2 /* Default@2x_iOS7.png */; };
 		53720240167BAFE7008356DB /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5372023E167BAFE7008356DB /* MainStoryboard.storyboard */; };
-		53720246167BB729008356DB /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 53720243167BB729008356DB /* Default-568h@2x.png */; };
-		53720247167BB729008356DB /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 53720244167BB729008356DB /* Default.png */; };
-		53720248167BB729008356DB /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 53720245167BB729008356DB /* Default@2x.png */; };
 		53A7B2750E311095003A40F3 /* MyTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A7B2730E311095003A40F3 /* MyTableViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1D6058910D05DD3D006BFB54 /* DateCell.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DateCell.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		3629FCFD1A239F83006F56DB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = DateCell/Images.xcassets; sourceTree = "<group>"; };
 		53095FEF0D9C4D0500F143AD /* Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Prefix.pch; sourceTree = "<group>"; };
 		53095FF20D9C4D1A00F143AD /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		53095FF30D9C4D1A00F143AD /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		53588079177DE96D0092E6E2 /* Default-568h@2x_iOS7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x_iOS7.png"; sourceTree = "<group>"; };
-		5358807A177DE96D0092E6E2 /* Default@2x_iOS7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x_iOS7.png"; sourceTree = "<group>"; };
 		5372023F167BAFE7008356DB /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
-		53720243167BB729008356DB /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		53720244167BB729008356DB /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
-		53720245167BB729008356DB /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		53A7B2730E311095003A40F3 /* MyTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyTableViewController.m; sourceTree = "<group>"; };
 		53A7B2740E311095003A40F3 /* MyTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTableViewController.h; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -67,11 +59,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				53720243167BB729008356DB /* Default-568h@2x.png */,
-				53720244167BB729008356DB /* Default.png */,
-				53720245167BB729008356DB /* Default@2x.png */,
-				53588079177DE96D0092E6E2 /* Default-568h@2x_iOS7.png */,
-				5358807A177DE96D0092E6E2 /* Default@2x_iOS7.png */,
+				3629FCFD1A239F83006F56DB /* Images.xcassets */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				5372023E167BAFE7008356DB /* MainStoryboard.storyboard */,
 			);
@@ -145,11 +133,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				53720240167BAFE7008356DB /* MainStoryboard.storyboard in Resources */,
-				5358807C177DE96D0092E6E2 /* Default@2x_iOS7.png in Resources */,
-				53720246167BB729008356DB /* Default-568h@2x.png in Resources */,
-				5358807B177DE96D0092E6E2 /* Default-568h@2x_iOS7.png in Resources */,
-				53720247167BB729008356DB /* Default.png in Resources */,
-				53720248167BB729008356DB /* Default@2x.png in Resources */,
+				3629FCFE1A239F83006F56DB /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -183,6 +167,8 @@
 		1D6058940D05DD3E006BFB54 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
@@ -237,6 +223,8 @@
 		1D6058950D05DD3E006BFB54 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES;
 				CLANG_ANALYZER_SECURITY_INSECUREAPI_RAND = YES;
