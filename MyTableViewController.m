@@ -1,15 +1,15 @@
 /*
-     File: MyTableViewController.m
+ File: MyTableViewController.m
  Abstract: The main table view controller of this app.
-  Version: 1.6
- 
+ Version: 1.6
+
  Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple
  Inc. ("Apple") in consideration of your agreement to the following
  terms, and your use, installation, modification or redistribution of
  this Apple software constitutes acceptance of these terms.  If you do
  not agree with these terms, please do not use, install, modify or
  redistribute this Apple software.
- 
+
  In consideration of your agreement to abide by the following terms, and
  subject to these terms, Apple grants you a personal, non-exclusive
  license, under Apple's copyrights in this original Apple software (the
@@ -25,13 +25,13 @@
  implied, are granted by Apple herein, including but not limited to any
  patent rights that may be infringed by your derivative works or by other
  works in which the Apple Software may be incorporated.
- 
+
  The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
  MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
  THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
  FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
  OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
- 
+
  IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
  OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
@@ -40,9 +40,9 @@
  AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
  STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
- 
+
  Copyright (C) 2014 Apple Inc. All Rights Reserved.
- 
+
  */
 
 #import "MyTableViewController.h"
@@ -68,11 +68,10 @@ NSUInteger DeviceSystemMajorVersion(void);
 
 @interface MyTableViewController ()
 
-@property (nonatomic, readwrite) NSArray *dataArray;
+@property (nonatomic, readwrite) NSArray *dataSource;
 @property (nonatomic, readwrite) NSDateFormatter *dateFormatter;
 @property (nonatomic, readwrite) NSIndexPath *datePickerIndexPath;
-@property (nonatomic, readwrite) CGFloat pickerCellRowHeight;
-@property (nonatomic, weak, readwrite) IBOutlet UIDatePicker *pickerView;
+@property (nonatomic, readwrite) CGFloat datePickerRowHeight;
 
 - (IBAction)dateAction:(id)sender;
 
@@ -85,25 +84,25 @@ NSUInteger DeviceSystemMajorVersion(void);
  */
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     // setup our data source
     NSMutableDictionary *itemOne = [@{ kTitleKey : @"Tap a cell to change its date:" } mutableCopy];
     NSMutableDictionary *itemTwo = [@{ kTitleKey : @"Start Date",
                                        kDateKey : [NSDate date] } mutableCopy];
     NSMutableDictionary *itemThree = [@{ kTitleKey : @"End Date",
-                                        kDateKey : [NSDate date] } mutableCopy];
+                                         kDateKey : [NSDate date] } mutableCopy];
     NSMutableDictionary *itemFour = [@{ kTitleKey : @"(other item1)" } mutableCopy];
     NSMutableDictionary *itemFive = [@{ kTitleKey : @"(other item2)" } mutableCopy];
 
-    self.dataArray = @[itemOne, itemTwo, itemThree, itemFour, itemFive];
+    self.dataSource = @[itemOne, itemTwo, itemThree, itemFour, itemFive];
     self.dateFormatter = [NSDateFormatter new];
     self.dateFormatter.dateStyle = NSDateFormatterShortStyle;
     self.dateFormatter.timeStyle = NSDateFormatterNoStyle;
-    
+
     // Obtain the height of the table view cell containing the date picker
     UITableViewCell *datePickerCell = [self.tableView dequeueReusableCellWithIdentifier:kDatePickerID];
-    self.pickerCellRowHeight = CGRectGetHeight(datePickerCell.frame);
-    
+    self.datePickerRowHeight = CGRectGetHeight(datePickerCell.frame);
+
     // Notify this object if the user changes locale settings.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(localeChanged:)
@@ -140,16 +139,16 @@ NSUInteger DeviceSystemMajorVersion(void) {
         // an "unrecognized selector" exception. Instead, we must invoke
         // integerValue and cast the result as an NSUInteger.
         _deviceSystemMajorVersion =
-            (NSUInteger)[[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@"."][0] integerValue];
+        (NSUInteger)[[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@"."][0] integerValue];
     });
-    
+
     return _deviceSystemMajorVersion;
 }
 
 #define EMBEDDED_DATE_PICKER (DeviceSystemMajorVersion() >= 7)
 
 /*! Determines if the given indexPath has a cell below it with a UIDatePicker.
- 
+
  @param indexPath The indexPath to check if its cell has a UIDatePicker below it.
  */
 - (BOOL)hasPickerForIndexPath:(NSIndexPath *)indexPath {
@@ -175,14 +174,14 @@ NSUInteger DeviceSystemMajorVersion(void) {
     UIDatePicker *datePicker = (UIDatePicker *)[datePickerCell viewWithTag:kDatePickerTag];
 
     if (datePicker) {
-        NSDictionary *itemData = self.dataArray[(NSUInteger)self.datePickerIndexPath.row - 1];
+        NSDictionary *itemData = self.dataSource[(NSUInteger)self.datePickerIndexPath.row - 1];
         datePicker.date = itemData[kDateKey];
     }
 
 }
 
 /*! Determines if the given indexPath points to a cell that contains the UIDatePicker.
- 
+
  @param indexPath The indexPath to check if it represents a cell with the UIDatePicker.
  */
 - (BOOL)indexPathHasPicker:(NSIndexPath *)indexPath {
@@ -198,9 +197,9 @@ NSUInteger DeviceSystemMajorVersion(void) {
 }
 
 /*! Determines if the given indexPath points to a cell that contains the start/end dates.
- 
-    @param indexPath The indexPath to check if it represents start/end date cell.
-*/
+
+ @param indexPath The indexPath to check if it represents start/end date cell.
+ */
 - (BOOL)indexPathHasDate:(NSIndexPath *)indexPath {
     BOOL result = NO;
 
@@ -218,18 +217,18 @@ NSUInteger DeviceSystemMajorVersion(void) {
 #pragma mark - UITableViewDataSource
 
 - (CGFloat)tableView:(__unused UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return ([self indexPathHasPicker:indexPath]) ? self.pickerCellRowHeight : self.tableView.rowHeight;
+    return ([self indexPathHasPicker:indexPath]) ? self.datePickerRowHeight : self.tableView.rowHeight;
 }
 
 - (NSInteger)tableView:(__unused UITableView *)tableView numberOfRowsInSection:(__unused NSInteger)section {
-    NSUInteger rowCount = self.dataArray.count;
+    NSUInteger rowCount = self.dataSource.count;
 
     // If a datepicker is visible, then account for it by incrementing the row
     // count by 1
     if (self.datePickerIndexPath) {
         rowCount ++;
     }
-    
+
     return (NSInteger)rowCount;
 }
 
@@ -256,8 +255,8 @@ NSUInteger DeviceSystemMajorVersion(void) {
     if (indexPath.row == 0) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    
-    dataSource = self.dataArray[(NSUInteger)row];
+
+    dataSource = self.dataSource[(NSUInteger)row];
 
     //-- Table view cell configuration
     if ([reuseIdentifier isEqualToString:kDateCellID]) {
@@ -268,20 +267,20 @@ NSUInteger DeviceSystemMajorVersion(void) {
     else if ([reuseIdentifier isEqualToString:kOtherCell]) {
         cell.textLabel.text = dataSource[kTitleKey];
     }
-    
-	return cell;
+
+    return cell;
 }
 
 /*! Adds or removes a UIDatePicker cell below the given indexPath.
- 
+
  @param indexPath The indexPath to reveal the UIDatePicker.
  */
 - (void)toggleDatePickerForSelectedIndexPath:(NSIndexPath *)indexPath {
     [self.tableView beginUpdates];
-    
+
     NSArray *indexPaths = @[[NSIndexPath indexPathForRow:indexPath.row + 1
                                                inSection:0]];
-                            
+
     // If the index path has a date picker, then remove it.
     if ([self hasPickerForIndexPath:indexPath]) {
         [self.tableView deleteRowsAtIndexPaths:indexPaths
@@ -293,12 +292,12 @@ NSUInteger DeviceSystemMajorVersion(void) {
         [self.tableView insertRowsAtIndexPaths:indexPaths
                               withRowAnimation:UITableViewRowAnimationFade];
     }
-    
+
     [self.tableView endUpdates];
 }
 
 /*! Reveals the date picker inline for the given indexPath, called by "didSelectRowAtIndexPath".
- 
+
  @param indexPath The indexPath to reveal the UIDatePicker.
  */
 - (void)displayInlineDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -354,7 +353,7 @@ NSUInteger DeviceSystemMajorVersion(void) {
 #pragma mark - Actions
 
 /*! User chose to change the date by changing the values inside the UIDatePicker.
- 
+
  @param sender The sender for this action: UIDatePicker.
  */
 - (IBAction)dateAction:(id)sender {
@@ -367,15 +366,15 @@ NSUInteger DeviceSystemMajorVersion(void) {
     // be 1 row above.
     if (self.datePickerIndexPath) {
         indexPath = [NSIndexPath indexPathForRow:self.datePickerIndexPath.row - 1
-                                                   inSection:0];
+                                       inSection:0];
     }
-    
+
     cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    
+
     // update our data model
-    dataSource = self.dataArray[(NSUInteger)indexPath.row];
+    dataSource = self.dataSource[(NSUInteger)indexPath.row];
     dataSource[kDateKey] = datePicker.date;
-    
+
     // update the cell's date string
     cell.detailTextLabel.text = [self.dateFormatter stringFromDate:datePicker.date];
 }
