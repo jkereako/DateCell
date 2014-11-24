@@ -35,13 +35,26 @@ Xcode 5.0, iOS SDK 7.0
 iOS 6.0 or later
 
 # Changes from previous versions
-1.6 - Fixed bug data source cell row detection in cellForRowAtIndexPath, now using CGRectGetHeight().
-1.5 - Editorial change
-1.4 - Added a screenshot for this sample.
-1.3 - Updated to use in-line UIDatePicker for iOS 7.
-1.2 - Upgraded for iOS 6.0, now using Automatic Reference Counting (ARC) and storyboards,
-      updated to adopt current best practices for Objective-C.
-1.1 - Upgraded project to build with the iOS 4 SDK.
-1.0 - First release.
+
+### 1.6
+Fixed bug data source cell row detection in cellForRowAtIndexPath, now using CGRectGetHeight().
+
+### 1.5
+Editorial change
+
+### 1.4
+Added a screenshot for this sample.
+
+### 1.3
+Updated to use in-line UIDatePicker for iOS 7.
+
+### 1.2
+Upgraded for iOS 6.0, now using Automatic Reference Counting (ARC) and storyboards, updated to adopt current best practices for Objective-C.
+
+### 1.1
+Upgraded project to build with the iOS 4 SDK.
+
+### 1.0
+First release.
 
 Copyright (C) 2009-2014 Apple Inc. All rights reserved.
