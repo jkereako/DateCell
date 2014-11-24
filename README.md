@@ -1,7 +1,17 @@
-# Changes made to this project
-The code example, [DateCell](https://developer.apple.com/library/ios/samplecode/datecell/introduction/intro.html) shows how to display UIPickerViews inline, per iOS 7 suggestions. The problem, is the code in this project is poorly written and hard to understand. It looks like an Apple engineer wrote this on his 30-minute lunchbreak.
+# Changes I made to this project
+The code example, [DateCell](https://developer.apple.com/library/ios/samplecode/datecell/introduction/intro.html) demonstrates how to display UIPickerViews inline, which is the suggested UIPickerView display method since iOS 7, instead of in modal views or in action sheets. The problem with this example is the code is poorly written and difficult to understand. This code looks it was written by an Apple engineer during a 30-minute lunch break (not joking).
 
-I went through the code removing unused variables and uneccessary logic in an attempt to make this code clearer so it can be used in other projects.
+Apple's DateCell example comes with support for iOS 6.1. I removed this feature because 1) my apps target iOS 7 and beyond, and 2) the fewer lines of code to read the easier it will be for you to understand.
+
+I spent 3 hours editing this code:
+- Removed unused variables and uneccessary logic,
+- Renamed variables so they actually describe the values which they hold
+- Added my own comments and removed comments which we unclear
+- Removed unused conditions
+- Removed support for iOS 6.1
+- Converted `if` statements to `switch` statements wherever I could. I believe `switch` statements to be easier to read.
+- Set XCode to hard-mode and compiled the project, resulting in 0 warnings and errors
+- Added support for sizeclasses in Storyboard, because why not?
 
 # Description
 Demonstrates formatted display of date objects in table cells and use of UIDatePicker to edit those values.
