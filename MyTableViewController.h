@@ -45,7 +45,7 @@
  
  */
 
-#import <UIKit/UIKit.h>
+@import UIKit;
 
 @interface MyTableViewController : UITableViewController
 

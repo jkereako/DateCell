@@ -74,8 +74,7 @@ NSUInteger DeviceSystemMajorVersion(void);
 @property (nonatomic, readwrite) CGFloat pickerCellRowHeight;
 @property (nonatomic, weak, readwrite) IBOutlet UIDatePicker *pickerView;
 
-// this button appears only when the date picker is shown (iOS 6.1.x or earlier)
-@property (nonatomic, weak, readwrite) IBOutlet UIBarButtonItem *doneButton;
+- (IBAction)dateAction:(id)sender;
 
 @end
 
@@ -333,41 +332,6 @@ NSUInteger DeviceSystemMajorVersion(void) {
     [self updateDatePicker];
 }
 
-/*! Reveals the UIDatePicker as an external slide-in view, iOS 6.1.x and earlier, called by "didSelectRowAtIndexPath".
- 
- @param indexPath The indexPath used to display the UIDatePicker.
- */
-- (void)displayExternalDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath {
-    // first update the date picker's date value according to our model
-    UIDatePicker *strongDatePicker = self.pickerView;
-    NSDictionary *itemData = self.dataArray[(NSUInteger)indexPath.row];
-    [strongDatePicker setDate:itemData[kDateKey] animated:YES];
-    
-    // the date picker might already be showing, so don't add it to our view
-    if (!strongDatePicker.superview) {
-        CGRect startFrame = strongDatePicker.frame;
-        CGRect endFrame = strongDatePicker.frame;
-        
-        // the start position is below the bottom of the visible frame
-        startFrame.origin.y = CGRectGetHeight(self.view.frame);
-        
-        // the end position is slid up by the height of the view
-        endFrame.origin.y = startFrame.origin.y - CGRectGetHeight(endFrame);
-        
-        strongDatePicker.frame = startFrame;
-        
-        [self.view addSubview:strongDatePicker];
-        
-        // animate the date picker into view
-        [UIView animateWithDuration:kPickerAnimationDuration animations: ^{ strongDatePicker.frame = endFrame; }
-                         completion:^(__unused BOOL finished) {
-                             // add the "Done" button to the nav bar
-                             self.navigationItem.rightBarButtonItem = self.doneButton;
-                         }];
-    }
-}
-
-
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -375,9 +339,6 @@ NSUInteger DeviceSystemMajorVersion(void) {
     if (cell.reuseIdentifier == kDateCellID) {
         if (EMBEDDED_DATE_PICKER) {
             [self displayInlineDatePickerForRowAtIndexPath:indexPath];
-        }
-        else {
-            [self displayExternalDatePickerForRowAtIndexPath:indexPath];
         }
     }
 
@@ -416,32 +377,6 @@ NSUInteger DeviceSystemMajorVersion(void) {
     
     // update the cell's date string
     cell.detailTextLabel.text = [self.dateFormatter stringFromDate:targetedDatePicker.date];
-}
-
-
-/*! User chose to finish using the UIDatePicker by pressing the "Done" button
-    (used only for "non-inline" date picker, iOS 6.1.x or earlier)
- 
- @param sender The sender for this action: The "Done" UIBarButtonItem
- */
-- (IBAction)doneAction:(__unused id)sender {
-    UIDatePicker *strongDatePicker = self.pickerView;
-    CGRect pickerFrame = strongDatePicker.frame;
-    pickerFrame.origin.y = CGRectGetHeight(self.view.frame);
-     
-    // animate the date picker out of view
-    [UIView animateWithDuration:kPickerAnimationDuration
-                     animations: ^{strongDatePicker.frame = pickerFrame; }
-                     completion:^(__unused BOOL finished) {
-                         [strongDatePicker removeFromSuperview];
-                     }];
-    
-    // remove the "Done" button in the navigation bar
-	self.navigationItem.rightBarButtonItem = nil;
-    
-    // deselect the current table cell
-	NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-	[self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end
