@@ -48,7 +48,7 @@
 #import "MyTableViewController.h"
 
 #define kPickerAnimationDuration    0.40   // duration for the animation to slide the date picker into view
-#define kDatePickerTag              99     // view tag identifiying the date picker view
+#define kDatePickerTag              99     // view tag identifying the date picker view
 
 #define kTitleKey       @"title"   // key for obtaining the data source item's title
 #define kDateKey        @"date"    // key for obtaining the data source item's date value
@@ -64,12 +64,14 @@ static NSString *kOtherCell = @"otherCell";     // the remaining cells at the en
 
 #pragma mark - Class extension
 
+NSUInteger DeviceSystemMajorVersion(void);
+
 @interface MyTableViewController ()
 
 @property (nonatomic, readwrite) NSArray *dataArray;
 @property (nonatomic, readwrite) NSDateFormatter *dateFormatter;
 @property (nonatomic, readwrite) NSIndexPath *datePickerIndexPath;
-@property (nonatomic, readwrite) NSInteger pickerCellRowHeight;
+@property (nonatomic, readwrite) CGFloat pickerCellRowHeight;
 @property (nonatomic, weak, readwrite) IBOutlet UIDatePicker *pickerView;
 
 // this button appears only when the date picker is shown (iOS 6.1.x or earlier)
@@ -121,7 +123,7 @@ static NSString *kOtherCell = @"otherCell";     // the remaining cells at the en
 
 /*! Responds to region format or locale changes.
  */
-- (void)localeChanged:(NSNotification *)notif {
+- (void)localeChanged:(__unused NSNotification *)notif {
     [self.tableView reloadData];
 }
 
@@ -130,13 +132,16 @@ static NSString *kOtherCell = @"otherCell";     // the remaining cells at the en
 
 /*! Returns the major version of iOS, (i.e. for iOS 6.1.3 it returns 6)
  */
-NSUInteger DeviceSystemMajorVersion() {
-    static NSUInteger _deviceSystemMajorVersion = -1;
+NSUInteger DeviceSystemMajorVersion(void) {
+    static NSUInteger _deviceSystemMajorVersion = 0;
     static dispatch_once_t onceToken;
 
     dispatch_once(&onceToken, ^{
+        // Sending the message unsignedInterValue to an NSString raises an
+        // an "unrecognized selector" exception. Instead, we must invoke
+        // integerValue and cast the result as an NSUInteger.
         _deviceSystemMajorVersion =
-            [[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@"."][0] integerValue];
+            (NSUInteger)[[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@"."][0] integerValue];
     });
     
     return _deviceSystemMajorVersion;
@@ -171,7 +176,7 @@ NSUInteger DeviceSystemMajorVersion() {
 
     UIDatePicker *datePicker = (UIDatePicker *)[datePickerCell viewWithTag:kDatePickerTag];
     if (datePicker) {
-        NSDictionary *itemData = self.dataArray[self.datePickerIndexPath.row - 1];
+        NSDictionary *itemData = self.dataArray[(NSUInteger)self.datePickerIndexPath.row - 1];
         datePicker.date = itemData[kDateKey];
     }
 
@@ -212,12 +217,12 @@ NSUInteger DeviceSystemMajorVersion() {
 
 #pragma mark - UITableViewDataSource
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (CGFloat)tableView:(__unused UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return ([self indexPathHasPicker:indexPath]) ? self.pickerCellRowHeight : self.tableView.rowHeight;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSInteger rowCount = self.dataArray.count;
+- (NSInteger)tableView:(__unused UITableView *)tableView numberOfRowsInSection:(__unused NSInteger)section {
+    NSUInteger rowCount = self.dataArray.count;
 
     // If a datepicker is visible, then account for it by incrementing the row
     // count by 1
@@ -225,7 +230,7 @@ NSUInteger DeviceSystemMajorVersion() {
         rowCount ++;
     }
     
-    return rowCount;
+    return (NSInteger)rowCount;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -253,7 +258,7 @@ NSUInteger DeviceSystemMajorVersion() {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     
-    itemData = self.dataArray[row];
+    itemData = self.dataArray[(NSUInteger)row];
 
     //-- Table view cell configuration
     if ([reuseIdentifier isEqualToString:kDateCellID]) {
@@ -334,13 +339,14 @@ NSUInteger DeviceSystemMajorVersion() {
  */
 - (void)displayExternalDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath {
     // first update the date picker's date value according to our model
-    NSDictionary *itemData = self.dataArray[indexPath.row];
-    [self.pickerView setDate:[itemData valueForKey:kDateKey] animated:YES];
+    UIDatePicker *strongDatePicker = self.pickerView;
+    NSDictionary *itemData = self.dataArray[(NSUInteger)indexPath.row];
+    [strongDatePicker setDate:itemData[kDateKey] animated:YES];
     
     // the date picker might already be showing, so don't add it to our view
-    if (self.pickerView.superview == nil) {
-        CGRect startFrame = self.pickerView.frame;
-        CGRect endFrame = self.pickerView.frame;
+    if (!strongDatePicker.superview) {
+        CGRect startFrame = strongDatePicker.frame;
+        CGRect endFrame = strongDatePicker.frame;
         
         // the start position is below the bottom of the visible frame
         startFrame.origin.y = CGRectGetHeight(self.view.frame);
@@ -348,13 +354,13 @@ NSUInteger DeviceSystemMajorVersion() {
         // the end position is slid up by the height of the view
         endFrame.origin.y = startFrame.origin.y - CGRectGetHeight(endFrame);
         
-        self.pickerView.frame = startFrame;
+        strongDatePicker.frame = startFrame;
         
-        [self.view addSubview:self.pickerView];
+        [self.view addSubview:strongDatePicker];
         
         // animate the date picker into view
-        [UIView animateWithDuration:kPickerAnimationDuration animations: ^{ self.pickerView.frame = endFrame; }
-                         completion:^(BOOL finished) {
+        [UIView animateWithDuration:kPickerAnimationDuration animations: ^{ strongDatePicker.frame = endFrame; }
+                         completion:^(__unused BOOL finished) {
                              // add the "Done" button to the nav bar
                              self.navigationItem.rightBarButtonItem = self.doneButton;
                          }];
@@ -393,7 +399,8 @@ NSUInteger DeviceSystemMajorVersion() {
     if (self.datePickerIndexPath) {
         // inline date picker: update the cell's date "above" the date picker cell
         //
-        targetedCellIndexPath = [NSIndexPath indexPathForRow:self.datePickerIndexPath.row - 1 inSection:0];
+        targetedCellIndexPath = [NSIndexPath indexPathForRow:self.datePickerIndexPath.row - 1
+                                                   inSection:0];
     }
     else {
         // external date picker: update the current "selected" cell's date
@@ -404,7 +411,7 @@ NSUInteger DeviceSystemMajorVersion() {
     UIDatePicker *targetedDatePicker = sender;
     
     // update our data model
-    NSMutableDictionary *itemData = self.dataArray[targetedCellIndexPath.row];
+    NSMutableDictionary *itemData = self.dataArray[(NSUInteger)targetedCellIndexPath.row];
     [itemData setValue:targetedDatePicker.date forKey:kDateKey];
     
     // update the cell's date string
@@ -417,14 +424,16 @@ NSUInteger DeviceSystemMajorVersion() {
  
  @param sender The sender for this action: The "Done" UIBarButtonItem
  */
-- (IBAction)doneAction:(id)sender {
-    CGRect pickerFrame = self.pickerView.frame;
+- (IBAction)doneAction:(__unused id)sender {
+    UIDatePicker *strongDatePicker = self.pickerView;
+    CGRect pickerFrame = strongDatePicker.frame;
     pickerFrame.origin.y = CGRectGetHeight(self.view.frame);
      
     // animate the date picker out of view
-    [UIView animateWithDuration:kPickerAnimationDuration animations: ^{ self.pickerView.frame = pickerFrame; }
-                     completion:^(BOOL finished) {
-                         [self.pickerView removeFromSuperview];
+    [UIView animateWithDuration:kPickerAnimationDuration
+                     animations: ^{strongDatePicker.frame = pickerFrame; }
+                     completion:^(__unused BOOL finished) {
+                         [strongDatePicker removeFromSuperview];
                      }];
     
     // remove the "Done" button in the navigation bar
