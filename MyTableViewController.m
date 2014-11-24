@@ -160,33 +160,33 @@ NSUInteger DeviceSystemMajorVersion() {
  @param indexPath The indexPath to check if its cell has a UIDatePicker below it.
  */
 - (BOOL)hasPickerForIndexPath:(NSIndexPath *)indexPath {
-    BOOL hasDatePicker = NO;
-    
-    NSInteger targetedRow = indexPath.row;
-    targetedRow++;
-    
-    UITableViewCell *checkDatePickerCell =
-        [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:targetedRow inSection:0]];
-    UIDatePicker *checkDatePicker = (UIDatePicker *)[checkDatePickerCell viewWithTag:kDatePickerTag];
-    
-    hasDatePicker = (checkDatePicker != nil);
-    return hasDatePicker;
+    // Because the date picker will always appear beneath it's associated table
+    // view cell, we increment the indexPath.row by 1.
+    NSIndexPath *datePickerIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1
+                                                          inSection:0];
+
+    UITableViewCell *datePickerCell = [self.tableView cellForRowAtIndexPath:datePickerIndexPath];
+    UIDatePicker *datePicker = (UIDatePicker *)[datePickerCell viewWithTag:kDatePickerTag];
+
+    return (datePicker != nil);
 }
 
 /*! Updates the UIDatePicker's value to match with the date of the cell above it.
  */
 - (void)updateDatePicker {
-    if (self.datePickerIndexPath != nil) {
-        UITableViewCell *associatedDatePickerCell = [self.tableView cellForRowAtIndexPath:self.datePickerIndexPath];
-        
-        UIDatePicker *targetedDatePicker = (UIDatePicker *)[associatedDatePickerCell viewWithTag:kDatePickerTag];
-        if (targetedDatePicker != nil) {
-            // we found a UIDatePicker in this cell, so update it's date value
-            //
-            NSDictionary *itemData = self.dataArray[self.datePickerIndexPath.row - 1];
-            [targetedDatePicker setDate:[itemData valueForKey:kDateKey] animated:NO];
-        }
+    if (!self.datePickerIndexPath) {
+        return;
     }
+
+    UITableViewCell *datePickerCell = [self.tableView cellForRowAtIndexPath:self.datePickerIndexPath];
+
+    UIDatePicker *datePicker = (UIDatePicker *)[datePickerCell viewWithTag:kDatePickerTag];
+    if (datePicker) {
+        NSDictionary *itemData = self.dataArray[self.datePickerIndexPath.row - 1];
+        datePicker.date = itemData[kDateKey];
+//        [datePicker setDate:[itemData valueForKey:kDateKey] animated:NO];
+    }
+
 }
 
 /*! Determines if the UITableViewController has a UIDatePicker in any of its cells.
@@ -236,7 +236,7 @@ NSUInteger DeviceSystemMajorVersion() {
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = nil;
+    UITableViewCell *cell;
     
     NSString *cellID = kOtherCell;
     
@@ -406,7 +406,7 @@ NSUInteger DeviceSystemMajorVersion() {
  @param sender The sender for this action: UIDatePicker.
  */
 - (IBAction)dateAction:(id)sender {
-    NSIndexPath *targetedCellIndexPath = nil;
+    NSIndexPath *targetedCellIndexPath;
     
     if ([self hasInlineDatePicker]) {
         // inline date picker: update the cell's date "above" the date picker cell
