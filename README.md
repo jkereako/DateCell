@@ -1,5 +1,5 @@
 # Changes I made to this project
-The code example, [DateCell](https://developer.apple.com/library/ios/samplecode/datecell/introduction/intro.html) demonstrates how to display UIPickerViews inline, which is the suggested UIPickerView display method since iOS 7, instead of in modal views or in action sheets. The problem with this example is the code is poorly written and difficult to understand. This code looks it was written by an Apple engineer during a 30-minute lunch break (not joking).
+The code example, [DateCell](https://developer.apple.com/library/ios/samplecode/datecell/introduction/intro.html) demonstrates how to display UIPickerViews inline, which is the suggested UIPickerView display method since iOS 7, instead of in modal views or in action sheets. The problem with this example is the code is poorly written and difficult to understand. This code was first written 5 years ago in 2009, and during that time I'm certain new features and bug fixes were added by different developers which may have caused the confusing codebase.
 
 Apple's DateCell example comes with support for iOS 6.1. I removed this feature because 1) my apps target iOS 7 and beyond, and 2) the fewer lines of code to read the easier it will be for you to understand.
 
