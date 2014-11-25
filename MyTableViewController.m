@@ -76,7 +76,6 @@ NSUInteger DeviceSystemMajorVersion(void);
 - (BOOL)indexPathHasDate:(NSIndexPath *)indexPath;
 - (BOOL)indexPathHasPicker:(NSIndexPath *)indexPath;
 - (void)updateDatePicker;
-- (void)toggleDatePickerForSelectedIndexPath:(NSIndexPath *)indexPath;
 - (void)displayInlineDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath;
 - (IBAction)dateAction:(id)sender;
 
@@ -243,27 +242,24 @@ NSUInteger DeviceSystemMajorVersion(void) {
     return cell;
 }
 
-#pragma mark -
-/*! Adds or removes a UIDatePicker cell below the given indexPath.
+#pragma mark - UITableViewDelegate
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
 
- @param indexPath The indexPath to reveal the UIDatePicker.
- */
-- (void)toggleDatePickerForSelectedIndexPath:(NSIndexPath *)indexPath {
-    NSArray *indexPaths = @[[NSIndexPath indexPathForRow:indexPath.row + 1
-                                               inSection:0]];
-
-    // If the index path has a date picker, then remove it.
-    if ([self indexPathHasPicker:indexPath]) {
-        [self.tableView deleteRowsAtIndexPaths:indexPaths
-                              withRowAnimation:UITableViewRowAnimationFade];
+    // If the selected cell is a "date cell", then present a UIDatePicker below
+    // it.
+    if (cell.reuseIdentifier == kDateCellID) {
+        if (EMBEDDED_DATE_PICKER) {
+            [self displayInlineDatePickerForRowAtIndexPath:indexPath];
+        }
     }
 
-    // Otherwise, add a new date picker to the index path.
     else {
-        [self.tableView insertRowsAtIndexPaths:indexPaths
-                              withRowAnimation:UITableViewRowAnimationFade];
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
 }
+
+#pragma mark -
 
 /*! Reveals the date picker inline for the given indexPath, called by "didSelectRowAtIndexPath".
 
@@ -272,26 +268,20 @@ NSUInteger DeviceSystemMajorVersion(void) {
 - (void)displayInlineDatePickerForRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView beginUpdates];
 
-    NSIndexPath *datePickerIndexPath;
-
     // Is a date picker already showing? If so, remove it from the table view.
     if (self.datePickerIndexPath) {
-        datePickerIndexPath = [NSIndexPath indexPathForRow:self.datePickerIndexPath.row
-                                                 inSection:0];
-        [self.tableView deleteRowsAtIndexPaths:@[datePickerIndexPath]
+        [self.tableView deleteRowsAtIndexPaths:@[self.datePickerIndexPath]
                               withRowAnimation:UITableViewRowAnimationFade];
         self.datePickerIndexPath = nil;
     }
 
     // Otherwise, add a new date picker to the table view
     else {
-        NSInteger datePickerRow =  (self.datePickerIndexPath.row > indexPath.row) ? indexPath.row - 1 : indexPath.row;
-        datePickerIndexPath = [NSIndexPath indexPathForRow:datePickerRow
-                                                 inSection:0];
+        self.datePickerIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1
+                                                      inSection:indexPath.section];
 
-        [self toggleDatePickerForSelectedIndexPath:datePickerIndexPath];
-        self.datePickerIndexPath = [NSIndexPath indexPathForRow:datePickerIndexPath.row + 1
-                                                      inSection:0];
+        [self.tableView insertRowsAtIndexPaths:@[self.datePickerIndexPath]
+                              withRowAnimation:UITableViewRowAnimationFade];
     }
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 
@@ -316,24 +306,6 @@ NSUInteger DeviceSystemMajorVersion(void) {
     }
     
 }
-
-#pragma mark - UITableViewDelegate
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-
-    // If the selected cell is a "date cell", then present a UIDatePicker below
-    // it.
-    if (cell.reuseIdentifier == kDateCellID) {
-        if (EMBEDDED_DATE_PICKER) {
-            [self displayInlineDatePickerForRowAtIndexPath:indexPath];
-        }
-    }
-
-    else {
-        [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    }
-}
-
 
 #pragma mark - Actions
 
