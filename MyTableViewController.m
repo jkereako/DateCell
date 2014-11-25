@@ -203,13 +203,11 @@ NSUInteger DeviceSystemMajorVersion(void) {
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell;
     NSString *reuseIdentifier = kOtherCell;
-    NSInteger row = indexPath.row;
     NSDictionary *dataSource;
 
     // Does this index path have a date picker? If so, decrement the row.
     if ([self indexPathHasPicker:indexPath]) {
         reuseIdentifier = kDatePickerID;
-        row --;
     }
 
     // Else, does this index path have a date string?
@@ -224,7 +222,7 @@ NSUInteger DeviceSystemMajorVersion(void) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
 
-    dataSource = self.dataSource[(NSUInteger)row];
+    dataSource = self.dataSource[(NSUInteger)indexPath.row];
 
     //-- Table view cell configuration
     if ([reuseIdentifier isEqualToString:kDateCellID]) {
@@ -245,7 +243,7 @@ NSUInteger DeviceSystemMajorVersion(void) {
 
     // If the selected cell is a "date cell", then present a UIDatePicker below
     // it.
-    if (cell.reuseIdentifier == kDateCellID) {
+    if ([cell.reuseIdentifier isEqualToString:kDateCellID]) {
         if (EMBEDDED_DATE_PICKER) {
             [self displayInlineDatePickerForRowAtIndexPath:indexPath];
         }
