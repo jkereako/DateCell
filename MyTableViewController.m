@@ -249,8 +249,6 @@ NSUInteger DeviceSystemMajorVersion(void) {
  @param indexPath The indexPath to reveal the UIDatePicker.
  */
 - (void)toggleDatePickerForSelectedIndexPath:(NSIndexPath *)indexPath {
-    [self.tableView beginUpdates];
-
     NSArray *indexPaths = @[[NSIndexPath indexPathForRow:indexPath.row + 1
                                                inSection:0]];
 
@@ -265,8 +263,6 @@ NSUInteger DeviceSystemMajorVersion(void) {
         [self.tableView insertRowsAtIndexPaths:indexPaths
                               withRowAnimation:UITableViewRowAnimationFade];
     }
-
-    [self.tableView endUpdates];
 }
 
 /*! Reveals the date picker inline for the given indexPath, called by "didSelectRowAtIndexPath".
