@@ -61,7 +61,6 @@ static NSString *kDateCellID = @"dateCell";     // the cells with the start or e
 static NSString *kDatePickerID = @"datePicker"; // the cell containing the date picker
 static NSString *kOtherCell = @"otherCell";     // the remaining cells at the end
 
-
 #pragma mark - Class extension
 
 NSUInteger DeviceSystemMajorVersion(void);
@@ -159,9 +158,7 @@ NSUInteger DeviceSystemMajorVersion(void) {
     BOOL result = NO;
 
     if (self.datePickerIndexPath) {
-        if (self.datePickerIndexPath.row == indexPath.row) {
-            result = YES;
-        }
+        result = [self.datePickerIndexPath isEqual:indexPath];
     }
 
     return result;
@@ -319,11 +316,11 @@ NSUInteger DeviceSystemMajorVersion(void) {
     UIDatePicker *datePicker = (UIDatePicker *)sender;
     NSMutableDictionary *dataSource;
 
-    // If the date picker is showing, update it's owner cell which will always
-    // be 1 row above.
+    // Is the date picker showing? If so, find it's corresponding table view
+    // cell which will always be 1 row above the date picker.
     if (self.datePickerIndexPath) {
         indexPath = [NSIndexPath indexPathForRow:self.datePickerIndexPath.row - 1
-                                       inSection:0];
+                                       inSection:self.datePickerIndexPath.section];
     }
 
     cell = [self.tableView cellForRowAtIndexPath:indexPath];
